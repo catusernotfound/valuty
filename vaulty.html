@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1f1c"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Vaulty"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Vaulty</title>
+<style>
+:root{--bg:#0e1f1c;--card:#16302a;--card2:#1c3b34;--ink:#f1ead8;--mut:#9fb3a8;--brass:#d9a441;--brass2:#f0c874;--bad:#ff7a6b;--ok:#6fd3a0;--line:#27463f;--serif:"Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(900px 500px at 50% -10%,#1b3a33,var(--bg));color:var(--ink);font:15px/1.5 var(--sans);min-height:100vh}
+[hidden]{display:none!important}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;border-radius:10px;padding:9px 14px;background:var(--card2);transition:transform .15s,background .2s}
+button:hover{background:#25493f;transform:translateY(-1px)}
+button:active{transform:scale(.96)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.pri{background:var(--brass);color:#2a1d04;font-weight:600}.pri:hover{background:var(--brass2)}
+input,textarea{font-size:16px;width:100%;background:#0f2622;border:1px solid var(--line);border-radius:10px;padding:10px 12px;transition:border-color .2s}
+input:focus,textarea:focus{border-color:var(--brass)}
+h1,h2{font-family:var(--serif);font-weight:600;margin:0}
+#lock{min-height:100vh;display:grid;place-items:center;padding:20px}
+#lcard{width:100%;max-width:380px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:32px 28px;box-shadow:0 20px 60px #0008;animation:rise .7s cubic-bezier(.2,.9,.3,1) both}
+#lcard form{display:grid;gap:12px;margin-top:20px}
+#lcard p{color:var(--mut);margin:6px 0 0}
+#err{color:var(--bad);min-height:20px;font-size:14px}
+.shake{animation:shake .45s}
+.keyhole{width:84px;height:96px;margin:0 auto 10px;display:block}
+.sh{transform-origin:12px 24px;transition:transform .6s cubic-bezier(.3,1.6,.5,1)}
+.open .sh{transform:translateY(-10px) rotate(-28deg)}
+.glow{animation:pulse 2.8s ease-in-out infinite}
+#top{position:sticky;top:0;z-index:5;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:max(14px,env(safe-area-inset-top)) 20px 14px;background:#0e1f1ccc;backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+#top h1{font-size:22px;margin-right:auto;display:flex;align-items:center;gap:10px}#lg{border-radius:9px}
+#q{max-width:260px;flex:1 1 160px}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr));gap:16px;padding:20px;max-width:1200px;margin:auto}
+.card{min-width:0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:10px;animation:rise .5s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--i)*45ms);transition:transform .25s,border-color .25s}
+.card:hover{transform:translateY(-3px);border-color:var(--brass)}
+.card.out{animation:out .3s forwards}
+.hd{display:flex;gap:12px;align-items:center;min-width:0}.hd>div:last-child{min-width:0;flex:1}
+.av{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font:600 20px var(--serif);color:#1b1304;flex:none}
+.hd b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd small{color:var(--mut);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row{display:flex;align-items:center;gap:6px;background:#0f2622;border-radius:10px;padding:5px 5px 5px 12px}
+.row span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px}
+.row button{padding:5px 10px;font-size:13px}
+.act{display:flex;gap:8px;justify-content:flex-end}
+.act button{font-size:13px;padding:5px 10px;background:transparent;color:var(--mut)}
+.act .d:hover{color:var(--bad)}
+#empty{text-align:center;color:var(--mut);padding:70px 20px;animation:rise .6s both}
+#empty h2{color:var(--ink);margin-bottom:6px}
+#modal{position:fixed;inset:0;background:#000a;display:grid;place-items:center;padding:16px;z-index:10;animation:fade .2s}
+#mbox{width:100%;max-width:460px;max-height:94vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;animation:pop .3s cubic-bezier(.2,1.3,.4,1)}
+#mbox form{display:grid;gap:12px;margin-top:14px}
+label{display:grid;gap:5px;color:var(--mut);font-size:13px}
+.pw{display:flex;gap:6px}.pw input{flex:1}
+.bar{height:6px;border-radius:6px;background:#0f2622;overflow:hidden}
+.bar i{display:block;height:100%;width:0;transition:width .4s,background .4s}
+.gen{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:13px}.gen input{padding:0}
+.btns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+#toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);background:var(--brass);color:#2a1d04;font-weight:600;padding:10px 18px;border-radius:30px;opacity:0;pointer-events:none;transition:.3s;z-index:20}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}}
+@keyframes pop{from{opacity:0;transform:scale(.9)}}
+@keyframes fade{from{opacity:0}}
+@keyframes out{to{opacity:0;transform:translateX(40px) scale(.9)}}
+@keyframes shake{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+@keyframes pulse{50%{opacity:.55}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;animation-delay:0s!important}}
+@media(max-width:560px){#top h1{width:100%}#top button{flex:1 1 auto;padding:9px 10px;font-size:14px}#q{max-width:none;order:5;flex-basis:100%}#grid{padding:14px}}
+</style></head>
+<body>
+<section id="lock"><div id="lcard">
+<svg class="keyhole" id="kh" viewBox="0 0 24 28" fill="none">
+<path class="sh" d="M6 12V8a6 6 0 0 1 12 0v4" stroke="#d9a441" stroke-width="2.4" stroke-linecap="round"/>
+<rect x="3" y="12" width="18" height="14" rx="3.5" fill="#d9a441"/>
+<circle class="glow" cx="12" cy="17.5" r="2.2" fill="#16302a"/><path class="glow" d="M11 18.5h2l.6 4h-3.2z" fill="#16302a"/></svg>
+<h1 id="lt"></h1><p id="ls"></p>
+<form id="lf"><input id="pw" type="password" placeholder="Master password" autocomplete="off">
+<input id="pw2" type="password" placeholder="Repeat master password" autocomplete="off">
+<div id="err" role="alert"></div><button class="pri" id="lb"></button><button type="button" id="bl" hidden>Unlock with fingerprint</button></form>
+</div></section>
+
+<section id="app" hidden>
+<header id="top"><h1><img id="lg" alt="" width="32" height="32">Vaulty</h1>
+<input id="q" type="search" placeholder="Search your vault">
+<button class="pri" id="add">Add password</button>
+<button id="imp">Import CSV</button><button id="exp">Export CSV</button><button id="bio"></button><button id="lk">Lock</button>
+<input id="file" type="file" accept=".csv,text/csv" hidden></header>
+<main id="grid"></main>
+<div id="empty" hidden><h2>Your vault is empty</h2><p>Add your first password, or import a CSV from another manager.</p></div>
+</section>
+
+<div id="modal" hidden><div id="mbox" role="dialog" aria-modal="true">
+<h2 id="mt"></h2>
+<form id="mf">
+<label>Name<input id="f_n" required placeholder="e.g. Gmail"></label>
+<label>Website<input id="f_u" placeholder="https://"></label>
+<label>Username or email<input id="f_l" autocomplete="off"></label>
+<label>Password<div class="pw"><input id="f_p" required autocomplete="off"><button type="button" id="gen">Generate</button></div></label>
+<div class="bar"><i id="sb"></i></div>
+<div class="gen">Length <input id="len" type="range" min="8" max="32" value="18"><b id="lv">18</b></div>
+<label>Notes<textarea id="f_o" rows="2"></textarea></label>
+<div class="btns"><button type="button" id="cx">Cancel</button><button class="pri">Save</button></div>
+</form></div></div>
+<div id="toast" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s),enc=new TextEncoder(),dec=new TextDecoder();
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b))),unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const K='vaulty-vault-v1';
+let items=[],key,salt,idle,editId=null,mp=null;
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1900)}
+async function derive(pw,s){const m=await crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:s,iterations:250000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function seal(){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc.encode(JSON.stringify(items)));localStorage.setItem(K,JSON.stringify({s:b64(salt),i:b64(iv),d:b64(ct)}))}
+async function openVault(pw){const v=JSON.parse(localStorage.getItem(K));salt=unb64(v.s);key=await derive(pw,salt);items=JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(v.i)},key,unb64(v.d))))}
+
+function showLock(){
+  const has=!!localStorage.getItem(K);
+  $('#app').hidden=true;$('#lock').hidden=false;$('#kh').classList.remove('open');
+  $('#lt').textContent=has?'Welcome back':'Create your vault';
+  $('#ls').textContent=has?'Enter your master password to unlock.':'Choose a strong master password. It can’t be recovered if you forget it.';
+  $('#pw2').hidden=has;$('#lb').textContent=has?'Unlock':'Create vault';
+  $('#pw').value=$('#pw2').value='';$('#err').textContent='';$('#pw').focus();$('#bl').hidden=!(has&&bioOK()&&bioOn());
+}
+function bad(m){const c=$('#lcard');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');$('#err').textContent=m}
+$('#lf').onsubmit=async e=>{
+  e.preventDefault();const p=$('#pw').value,has=!!localStorage.getItem(K);$('#lb').disabled=true;
+  try{
+    if(!has){
+      if(p.length<8)return bad('Use at least 8 characters.');
+      if(p!==$('#pw2').value)return bad('The two passwords don’t match.');
+      salt=crypto.getRandomValues(new Uint8Array(16));key=await derive(p,salt);items=[];await seal();
+    }else{try{await openVault(p)}catch{return bad('Wrong master password. Try again.')}}
+    mp=p;finish();
+  }finally{$('#lb').disabled=false}
+};
+function finish(){$('#kh').classList.add('open');$('#err').textContent='';setTimeout(()=>{$('#lock').hidden=true;$('#app').hidden=false;updBio();render();arm()},650)}
+function lock(){key=null;mp=null;items=[];clearTimeout(idle);closeM();showLock()}
+function arm(){clearTimeout(idle);if(key)idle=setTimeout(()=>{lock();toast('Locked after 5 minutes of inactivity')},300000)}
+['click','keydown','mousemove','touchstart'].forEach(ev=>addEventListener(ev,arm,{passive:true}));
+$('#lk').onclick=lock;
+
+function render(){
+  const q=$('#q').value.toLowerCase().trim();
+  const list=items.filter(i=>!q||[i.name,i.url,i.user,i.notes].join(' ').toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name));
+  $('#empty').hidden=list.length>0||!!q;
+  $('#grid').innerHTML=list.map((i,n)=>{
+    const h=[...i.name].reduce((a,c)=>a+c.charCodeAt(0),0)*37%360;
+    return `<div class="card" style="--i:${Math.min(n,14)}" data-id="${i.id}">
+<div class="hd"><div class="av" style="background:hsl(${h} 55% 62%)">${esc(i.name.trim()[0]||'?').toUpperCase()}</div><div><b>${esc(i.name)}</b><small>${esc(i.url)||'No website'}</small></div></div>
+<div class="row"><span>${esc(i.user)||'No username'}</span><button data-a="cu">Copy</button></div>
+<div class="row"><span class="pv">••••••••••</span><button data-a="sh">Show</button><button data-a="cp">Copy</button></div>
+<div class="act"><button data-a="ed">Edit</button><button class="d" data-a="del">Delete</button></div></div>`}).join('');
+}
+$('#q').oninput=render;
+async function copy(t,m){try{await navigator.clipboard.writeText(t);toast(m)}catch{toast('Couldn’t copy. Your browser blocked clipboard access.')}}
+$('#grid').onclick=async e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const c=b.closest('.card'),it=items.find(i=>i.id===c.dataset.id),a=b.dataset.a;
+  if(a==='cu')copy(it.user,'Username copied');
+  if(a==='cp'){copy(it.pass,'Password copied');setTimeout(()=>navigator.clipboard.writeText('').catch(()=>{}),30000)}
+  if(a==='sh'){const s=c.querySelector('.pv'),on=b.textContent==='Show';s.textContent=on?it.pass:'••••••••••';b.textContent=on?'Hide':'Show'}
+  if(a==='ed')openM(it);
+  if(a==='del'&&confirm('Delete “'+it.name+'”? This can’t be undone.')){c.classList.add('out');setTimeout(async()=>{items=items.filter(i=>i.id!==it.id);await seal();render();toast('Deleted')},300)}
+};
+
+function strength(p){let s=0;if(p.length>=8)s++;if(p.length>=12)s++;if(p.length>=16)s++;if(/[a-z]/.test(p)&&/[A-Z]/.test(p))s++;if(/\d/.test(p))s++;if(/[^A-Za-z0-9]/.test(p))s++;return Math.min(s,5)}
+function paintBar(){const s=strength($('#f_p').value),b=$('#sb');b.style.width=s*20+'%';b.style.background=['#ff7a6b','#ff7a6b','#f0a64a','#d9d046','#8fd97a','#6fd3a0'][s]}
+function gen(){const n=+$('#len').value,sets=['abcdefghijkmnopqrstuvwxyz','ABCDEFGHJKLMNPQRSTUVWXYZ','23456789','!@#$%^&*-_=+?'],all=sets.join('');
+  const r=m=>{const a=new Uint32Array(1);let x;do{crypto.getRandomValues(a);x=a[0]}while(x>=4294967296-4294967296%m);return x%m};
+  const out=sets.map(s=>s[r(s.length)]);while(out.length<n)out.push(all[r(all.length)]);
+  for(let i=out.length-1;i>0;i--){const j=r(i+1);[out[i],out[j]]=[out[j],out[i]]}
+  $('#f_p').value=out.join('');paintBar()}
+$('#gen').onclick=gen;$('#f_p').oninput=paintBar;$('#len').oninput=()=>{$('#lv').textContent=$('#len').value;gen()};
+
+function openM(it){editId=it?it.id:null;$('#mt').textContent=it?'Edit password':'Add password';
+  $('#f_n').value=it?.name||'';$('#f_u').value=it?.url||'';$('#f_l').value=it?.user||'';$('#f_p').value=it?.pass||'';$('#f_o').value=it?.notes||'';
+  $('#modal').hidden=false;paintBar();$('#f_n').focus()}
+function closeM(){$('#modal').hidden=true}
+$('#add').onclick=()=>{openM();gen()};$('#cx').onclick=closeM;
+$('#modal').onclick=e=>{if(e.target.id==='modal')closeM()};
+addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+$('#mf').onsubmit=async e=>{e.preventDefault();
+  const d={name:$('#f_n').value.trim(),url:$('#f_u').value.trim(),user:$('#f_l').value.trim(),pass:$('#f_p').value,notes:$('#f_o').value.trim()};
+  if(editId)Object.assign(items.find(i=>i.id===editId),d);else items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),...d});
+  await seal();closeM();render();toast('Saved')};
+
+/* CSV */
+const csvCell=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+$('#exp').onclick=()=>{
+  if(!items.length)return toast('Nothing to export yet');
+  if(!confirm('The CSV file is NOT encrypted. Anyone who opens it can read every password. Export anyway?'))return;
+  const rows=[['name','url','username','password','note'],...items.map(i=>[i.name,i.url,i.user,i.pass,i.notes])];
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n')],{type:'text/csv'}));
+  a.download='vaulty-export-'+new Date().toISOString().slice(0,10)+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast('Exported '+items.length+' passwords')};
+function parseCSV(t){t=t.replace(/^\ufeff/,'');const r=[];let row=[],f='',q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c=='"')q=true;else if(c==','){row.push(f);f=''}
+    else if(c=='\n'||c=='\r'){if(c=='\r'&&t[i+1]=='\n')i++;row.push(f);f='';if(row.some(x=>x))r.push(row);row=[]}else f+=c}
+  row.push(f);if(row.some(x=>x))r.push(row);return r}
+$('#imp').onclick=()=>$('#file').click();
+$('#file').onchange=async e=>{
+  const fl=e.target.files[0];e.target.value='';if(!fl)return;
+  const rows=parseCSV(await fl.text());if(rows.length<2)return toast('That CSV looks empty');
+  const h=rows[0].map(x=>x.trim().toLowerCase()),ix=(...k)=>h.findIndex(x=>k.includes(x));
+  const c={n:ix('name','title','site'),u:ix('url','website','login_uri'),l:ix('username','login','login_username','email'),p:ix('password','login_password'),o:ix('note','notes')};
+  if(c.p<0)return toast('No password column found. Expected: name, url, username, password, note');
+  let added=0,skipped=0;
+  for(const r of rows.slice(1)){
+    const d={name:(r[c.n]||r[c.u]||'Untitled').trim(),url:(r[c.u]||'').trim(),user:(r[c.l]||'').trim(),pass:r[c.p]||'',notes:(r[c.o]||'').trim()};
+    if(!d.pass){skipped++;continue}
+    if(items.some(i=>i.name===d.name&&i.user===d.user&&i.pass===d.pass)){skipped++;continue}
+    items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),...d});added++}
+  await seal();render();toast('Imported '+added+(skipped?' ('+skipped+' skipped)':''))};
+
+/* Fingerprint unlock (WebAuthn + PRF): the master password is stored encrypted with a secret only your fingerprint can release */
+const KB=K+'-bio';
+const bioOK=()=>!!window.PublicKeyCredential&&window.isSecureContext&&location.protocol!=='file:';
+const bioOn=()=>!!localStorage.getItem(KB);
+const inApp=()=>navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+function uaInfo(){
+  const u=navigator.userAgent;
+  const pats=[[/SamsungBrowser\/(\d+)/,'Samsung Internet'],[/Edg\/(\d+)/,'Edge'],[/Firefox\/(\d+)/,'Firefox'],[/OPR\/(\d+)/,'Opera'],[/Chrome\/(\d+)/,'Chrome'],[/Version\/(\d+)/,'Safari']];
+  let b='unknown browser';
+  for(const [re,n] of pats){const m=re.exec(u);if(m){b=n+' '+m[1];break}}
+  const a=/Android (\d+)/.exec(u);
+  return b+(a?', Android '+a[1]:'');
+}
+function prfMsg(){
+  let m='Fingerprint encryption (WebAuthn PRF) isn’t supported by '+uaInfo()+'. ';
+  m+=/Android/.test(uaInfo())?'If a password-manager app (Bitwarden, 1Password, Samsung Pass…) is your passkey provider, switch it to Google Password Manager in Settings, or update that app.':'Update your browser.';
+  return m+' You can still use your master password.';
+}
+function updBio(){$('#bio').textContent=bioOn()?'Disable fingerprint':'Enable fingerprint'}
+async function prf(cid,ps){
+  const r=await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:cid}],userVerification:'required',timeout:60000,extensions:{prf:{eval:{first:ps}}}}});
+  if(!r)throw {name:'NotAllowedError'};
+  const o=r.getClientExtensionResults().prf?.results?.first;
+  if(!o)throw {name:'NotSupportedError'};
+  return crypto.subtle.importKey('raw',o,'AES-GCM',false,['encrypt','decrypt']);
+}
+function bioErr(e){
+  const n=e&&e.name;
+  if(n==='NotAllowedError')return 'Fingerprint was cancelled or timed out — or this device has no screen-lock fingerprint set up.';
+  if(n==='AbortError')return 'Fingerprint request timed out. Try again.';
+  if(n==='NotSupportedError')return prfMsg();
+  if(n==='SecurityError')return 'Fingerprint unlock needs a secure https page.';
+  if(n==='InvalidStateError')return 'Couldn’t set up fingerprint. If Vaulty is installed as an app, open it in your browser and try again.';
+  return 'Couldn’t set up fingerprint ('+(n||e&&e.message||'unknown error')+' on '+uaInfo()+')'+(inApp()?'. Installed-app mode can block fingerprint — try opening Vaulty in your browser.':'.');
+}
+async function bioSensor(){
+  try{return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()}catch{return true}
+}
+$('#bio').onclick=async()=>{
+  if(bioOn()){localStorage.removeItem(KB);updBio();return toast('Fingerprint unlock turned off')}
+  if(!bioOK())return toast('Fingerprint needs https or localhost. Browsers block it on a plain file.');
+  if(!await bioSensor())return toast('No fingerprint sensor available here. Set up a screen lock (fingerprint or face ID) on this device first.');
+  let c;
+  try{
+    c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'Vaulty'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'vaulty',displayName:'Vaulty'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},extensions:{prf:{}}}});
+  }catch(e){return toast(bioErr(e))}
+  if(!c)return toast('Fingerprint setup was cancelled.');
+  if(!c.getClientExtensionResults().prf?.enabled)return toast(prfMsg());
+  try{
+    const ps=crypto.getRandomValues(new Uint8Array(32)),k=await prf(c.rawId,ps),iv=crypto.getRandomValues(new Uint8Array(12));
+    const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,enc.encode(mp));
+    localStorage.setItem(KB,JSON.stringify({c:b64(c.rawId),p:b64(ps),i:b64(iv),d:b64(ct)}));
+    updBio();toast('Fingerprint unlock is on');
+  }catch(e){toast(bioErr(e))}
+};
+$('#bl').onclick=async()=>{
+  try{
+    const v=JSON.parse(localStorage.getItem(KB));
+    if(!v)throw {name:'NotAllowedError'};
+    const k=await prf(unb64(v.c),unb64(v.p));
+    const p=dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(v.i)},k,unb64(v.d)));
+    await openVault(p);mp=p;finish();
+  }catch(e){bad(e&&e.name==='NotSupportedError'?prfMsg():'Fingerprint didn’t work. Use your master password.')}
+};
+/* Logo, favicon and installable app */
+const logo=r=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="${r}" fill="#0e1f1c"/><path d="M32 9 51 16v15c0 11-8 19-19 24C21 50 13 42 13 31V16z" fill="#d9a441"/><circle cx="32" cy="28" r="6" fill="#0e1f1c"/><path d="M29.5 32h5l2.5 12H27z" fill="#0e1f1c"/></svg>`);
+$('#lg').src=logo(15);
+const fav=document.createElement('link');fav.rel='icon';fav.href=logo(15);document.head.append(fav);
+if(location.protocol.startsWith('http')){
+  const im=new Image();
+  im.onload=()=>{
+    const c=document.createElement('canvas');c.width=c.height=512;c.getContext('2d').drawImage(im,0,0,512,512);
+    const ic=c.toDataURL('image/png'),a=document.createElement('link');a.rel='apple-touch-icon';a.href=ic;document.head.append(a);
+    const m={name:'Vaulty',short_name:'Vaulty',start_url:location.pathname,scope:location.pathname.replace(/[^/]*$/,''),display:'standalone',background_color:'#0e1f1c',theme_color:'#0e1f1c',icons:[{src:ic,sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
+    const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'}));document.head.append(l);
+    if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+  };
+  im.src=logo(0);
+}
+updBio();
+showLock();
+</script></body></html>
